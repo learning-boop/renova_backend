@@ -9,7 +9,7 @@ const pool = new Pool({
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 5000, // 5s — accounts for AWS RDS cold start + network latency
 });
 
 pool.on('error', (err) => {
