@@ -1,6 +1,7 @@
 const express = require('express');
 const { rateLimit } = require('express-rate-limit');
 const pool = require('../db/pool');
+const adminAuth = require('../middleware/adminAuth');
 
 const router = express.Router();
 
@@ -18,6 +19,14 @@ router.post('/', formLimiter, async (req, res, next) => {
 
     if (!name || !email || !message) {
       return res.status(400).json({ error: 'Name, email, and message are required.' });
+    }
+
+    if (name.trim().length > 150) {
+      return res.status(400).json({ error: 'Name is too long.' });
+    }
+
+    if (message.trim().length > 5000) {
+      return res.status(400).json({ error: 'Message is too long. Maximum 5000 characters.' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,20 +52,25 @@ router.post('/', formLimiter, async (req, res, next) => {
 });
 
 // GET /api/contact — list all submissions (admin use)
-router.get('/', async (req, res, next) => {
+router.get('/', adminAuth, async (req, res, next) => {
   try {
-    const { status, limit = 50, offset = 0 } = req.query;
+    const { status } = req.query;
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 50, 1), 200);
+    const offset = Math.max(parseInt(req.query.offset) || 0, 0);
 
     let query = `SELECT * FROM contacts`;
     const params = [];
 
     if (status) {
+      if (!['new', 'read', 'replied'].includes(status)) {
+        return res.status(400).json({ error: 'Invalid status filter.' });
+      }
       params.push(status);
       query += ` WHERE status = $${params.length}`;
     }
 
     query += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(parseInt(limit), parseInt(offset));
+    params.push(limit, offset);
 
     const result = await pool.query(query, params);
     res.json({ data: result.rows, count: result.rowCount });
@@ -66,7 +80,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // PATCH /api/contact/:id/status — update contact status
-router.patch('/:id/status', async (req, res, next) => {
+router.patch('/:id/status', adminAuth, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

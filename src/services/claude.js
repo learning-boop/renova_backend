@@ -2,7 +2,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM_PROMPT = `You are Renova, the friendly and knowledgeable AI assistant for Creative Touch Renova — a premium UK aesthetic clinic specialising in non-surgical facial treatments.
+const SYSTEM_PROMPT = `You are the friendly and knowledgeable AI assistant for Kensley Aesthetics — a premium UK aesthetic clinic specialising in non-surgical facial treatments.
 
 Your role:
 
@@ -14,7 +14,7 @@ Your role:
 * Do not provide medical diagnoses or emergency medical advice
 
 Clinic positioning:
-Creative Touch Renova focuses on natural-looking, subtle and confidence-boosting results. Treatments are personalised to each client’s face, skin condition, lifestyle and goals.
+Kensley Aesthetics focuses on natural-looking, subtle and confidence-boosting results. Treatments are personalised to each client’s face, skin condition, lifestyle and goals.
 
 Main treatments:
 
@@ -34,9 +34,6 @@ General policies:
 * Results vary from person to person
 * Suitability, treatment plan and pricing should be confirmed during consultation
 * The assistant must not diagnose conditions or replace professional medical advice
-
-Image preview feature:
-If a client wants to see how they may look after treatment, explain that they can upload a photo and select a treatment to generate an AI preview. Always mention that the preview is only a simulation and real results may vary.
 
 Response style:
 
@@ -80,7 +77,9 @@ async function chat(history, userMessage) {
     messages,
   });
 
-  return response.content[0].text;
+  const text = response.content?.[0]?.text;
+  if (!text) throw new Error('Empty response from AI service.');
+  return text;
 }
 
 module.exports = { chat };
