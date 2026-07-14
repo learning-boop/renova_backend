@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"D:\\\\creative_touch\\\\renova-backend\" && node -e \"\nrequire\\('dotenv'\\).config\\(\\);\nconst { Pool } = require\\('pg'\\);\nconst pool = new Pool\\({\n  host: process.env.DB_HOST,\n  port: parseInt\\(process.env.DB_PORT || '5432'\\),\n  database: process.env.DB_NAME,\n  user: process.env.DB_USER,\n  password: process.env.DB_PASSWORD,\n  ssl: { rejectUnauthorized: false },\n  connectionTimeoutMillis: 8000,\n}\\);\nconsole.log\\('Connecting to:', process.env.DB_HOST\\);\npool.query\\('SELECT NOW\\(\\) as time, current_database\\(\\) as db, current_user as user'\\)\n  .then\\(r => {\n    console.log\\('Connected successfully'\\);\n    console.log\\('Time    :', r.rows[0].time\\);\n    console.log\\('Database:', r.rows[0].db\\);\n    console.log\\('User    :', r.rows[0].user\\);\n    return pool.query\\(\\\\`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name\\\\`\\);\n  }\\)\n  .then\\(r => {\n    console.log\\('Tables  :', r.rows.length ? r.rows.map\\(x => x.table_name\\).join\\(', '\\) : 'none found'\\);\n    pool.end\\(\\);\n  }\\)\n  .catch\\(err => {\n    console.error\\('Connection failed:', err.message\\);\n    pool.end\\(\\);\n  }\\);\n\")",
+      "Bash(cd \"D:\\\\creative_touch\\\\renova-backend\" && node test-db.js)",
+      "Bash(cd \"D:\\\\creative_touch\\\\renova-backend\" && rm test-db.js)"
+    ]
+  }
+}
