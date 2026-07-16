@@ -4,6 +4,21 @@ const { chat } = require('../services/claude');
 
 const router = express.Router();
 
+const CONTACT_INFO = {
+  whatsapp: { number: '+447920699154', url: 'https://wa.me/447920699154' },
+  instagram: { handle: '@kensleyaesthetics', url: 'https://www.instagram.com/kensleyaesthetics/' },
+  facebook: { url: 'https://www.facebook.com/profile.php?id=61591977870031' },
+  youtube: { url: 'https://www.youtube.com/channel/UCXApmZZivbQBNgQymp9dE6w' },
+  website: 'https://kensleyaesthetics.com',
+};
+
+const CONTACT_KEYWORDS = [
+  'contact', 'whatsapp', 'phone', 'book', 'booking', 'appointment',
+  'instagram', 'facebook', 'youtube', 'social', 'reach', 'call',
+  'message', 'website', 'link', 'number', 'find you', 'get in touch',
+  'schedule', 'reserve', 'dm', 'direct message',
+];
+
 const chatLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 20,
@@ -39,7 +54,13 @@ router.post('/message', chatLimiter, async (req, res, next) => {
 
     const reply = await chat(history, message.trim());
 
-    res.json({ reply });
+    const lowerMessage = message.toLowerCase();
+    const isContactQuery = CONTACT_KEYWORDS.some((kw) => lowerMessage.includes(kw));
+
+    res.json({
+      reply,
+      ...(isContactQuery && { showContact: true, contact: CONTACT_INFO }),
+    });
   } catch (err) {
     next(err);
   }

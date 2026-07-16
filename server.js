@@ -33,7 +33,7 @@ app.use(
 // Security (API routes)
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', process.env.CLIENT_URL, 'https://renova-xi.vercel.app'].filter(Boolean),
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://kensleyaesthetics.com', process.env.CLIENT_URL, 'https://renova-xi.vercel.app'].filter(Boolean),
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
